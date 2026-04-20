@@ -303,9 +303,7 @@ app.post("/login", async (req, res) => {
 
 
 app.get("/weather", async (req, res) => {
-  // Implement logic here based on the TODO 3.
-
-   try {
+  try {
     const auth = req.headers.authorization;
 
     if (!auth) {
@@ -314,14 +312,16 @@ app.get("/weather", async (req, res) => {
 
     const token = auth.split(" ")[1];
 
+    let decoded;
     try {
-      jwt.verify(token, JWT_SECRET);
+      decoded = jwt.verify(token, JWT_SECRET);
     } catch {
-      return res.status(401).json({ error: "Invalid token" });
+      return res.status(403).json({ error: "Invalid token" });
     }
 
-    const city = req.query.city;
+    req.user = decoded;
 
+    const city = req.query.city;
     if (!city) {
       return res.status(400).json({ error: "City required" });
     }
@@ -343,6 +343,7 @@ app.get("/weather", async (req, res) => {
       wind: current?.windspeedKmph,
       raw: data
     });
+
   } catch (err) {
     console.error("Weather error:", err);
     return res.status(500).json({ error: "Server error during weather fetch" });
