@@ -232,17 +232,13 @@ const JWT_SECRET = "abc123";
 
 app.use(express.json());
 
-// In-memory "database"
 let users = [];
 
-// Simple health check
 app.get("/", (_req, res) => {
   res.send("Server is running");
 });
 
-// =========================
-// POST /register
-// =========================
+
 app.post("/register", async (req, res) => {
   // Implement logic here based on the TODO 1.
   try {
@@ -270,13 +266,11 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// =========================
-// POST /login
-// =========================
+
 app.post("/login", async (req, res) => {
   // Implement logic here based on the TODO 2.
 
-  try {
+ try {
     const { email, password } = req.body || {};
 
     if (!email || !password) {
@@ -284,34 +278,30 @@ app.post("/login", async (req, res) => {
     }
 
     const user = users.find((u) => u.email === email);
-
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
 
     const match = await bcrypt.compare(password, user.passwordHash);
-
     if (!match) {
       return res.status(400).json({ error: "Wrong password" });
     }
 
     const token = jwt.sign(
       { email },
-      JWT_SECRET,
+      JWT_SECRET, 
       { expiresIn: "1h" }
     );
 
     return res.json({ token });
+
   } catch (err) {
     console.error("Login error:", err);
     return res.status(500).json({ error: "Server error during login" });
   }
 });
 
-// =========================
-// Protected Weather API
-// GET /weather?city=Riyadh
-// =========================
+
 app.get("/weather", async (req, res) => {
   // Implement logic here based on the TODO 3.
 
